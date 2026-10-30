@@ -167,8 +167,6 @@ tab1, tab2, tab3, tab4, tab5 = st.tabs([t["tab_home"], t["tab_process"], t["tab_
 with tab1:
     st.write("")
     st.write("")
-
-```
 # 使用容器构建欢迎面板
 with st.container(border=True):
     # 居中大标题
