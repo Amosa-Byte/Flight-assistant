@@ -135,7 +135,7 @@ else:
     MY_API_KEY = "本地测试Key"
 
 # ==========================================
-# 🎨 升级美化CSS（增加hover上浮、柔和阴影、首页卡片样式）
+# 🎨 修复文字看不见问题的CSS（高对比度）
 # ==========================================
 st.markdown("""
 <style>
@@ -162,14 +162,14 @@ st.markdown("""
         background: radial-gradient(circle, rgba(96,165,250,0.3) 0%, transparent 70%);
         border-radius: 50%;
     }
-    .hero-title { font-size: 34px !important; font-weight: 800 !important; color: white !important; margin-bottom: 14px; position: relative; z-index: 2; }
-    .hero-desc { font-size: 17px !important; color: #bfdbfe !important; margin-bottom: 28px; position: relative; z-index: 2; }
+    .hero-title { font-size: 34px !important; font-weight: 800 !important; color: white !important; margin-bottom: 14px; position: relative; z-index: 2; -webkit-text-fill-color: white !important; }
+    .hero-desc { font-size: 17px !important; color: #bfdbfe !important; margin-bottom: 28px; position: relative; z-index: 2; -webkit-text-fill-color: #bfdbfe !important; }
     .hero-tags { display: flex; gap: 16px; flex-wrap: wrap; position: relative; z-index: 2; }
     .hero-tag {
         background: rgba(255, 255, 255, 0.16);
         border: 1px solid rgba(255, 255, 255, 0.32);
         padding: 7px 18px; border-radius: 24px;
-        font-size: 13.5px; color: white !important;
+        font-size: 13.5px; color: white !important; -webkit-text-fill-color: white !important;
     }
 
     button[kind="secondary"] {
@@ -177,10 +177,10 @@ st.markdown("""
         background: transparent !important; height: 40px !important;
         padding: 0 18px !important; font-size: 14px !important; font-weight: 600 !important;
     }
-    button[kind="secondary"] p { color: #1677ff !important; }
+    button[kind="secondary"] p { color: #1677ff !important; -webkit-text-fill-color: #1677ff !important; }
 
-    button[data-baseweb="tab"] p { color: #64748b !important; font-size: 16px !important; font-weight: 600 !important; }
-    button[data-baseweb="tab"][aria-selected="true"] p { color: #1677ff !important; }
+    button[data-baseweb="tab"] p { color: #64748b !important; font-size: 16px !important; font-weight: 600 !important; -webkit-text-fill-color: #64748b !important; }
+    button[data-baseweb="tab"][aria-selected="true"] p { color: #1677ff !important; -webkit-text-fill-color: #1677ff !important; }
     div[data-baseweb="tab-highlight"] { background-color: #1677ff !important; height: 3px !important; }
 
     div[data-testid="stTextInput"] input {
@@ -196,7 +196,7 @@ st.markdown("""
         transition: all 0.25s ease;
     }
     button[kind="primary"]:hover { transform: translateY(-2px); box-shadow: 0 8px 18px rgba(22, 119, 255, 0.35); }
-    button[kind="primary"] p { color: white !important; }
+    button[kind="primary"] p { color: white !important; -webkit-text-fill-color: white !important; }
 
     div[data-testid="stVerticalBlockBorderWrapper"] {
         background-color: white !important; border-radius: 14px !important;
@@ -211,17 +211,21 @@ st.markdown("""
         border: 1px solid #f1f5f9; transition: transform 0.28s ease;
     }
     .text-card:hover { transform: translateY(-4px); }
-    .text-card b { color: #1677ff !important; font-size: 17px; display: block; margin-bottom: 8px; }
+    .text-card b { color: #1677ff !important; font-size: 17px; display: block; margin-bottom: 8px; -webkit-text-fill-color: #1677ff !important; }
 
-    /* 首页欢迎卡片 */
+    /* 首页欢迎卡片【修复文字看不见，高对比度】 */
     .welcome-card {
         background: linear-gradient(135deg, #ffffff 0%, #f0f7ff 100%);
         border-radius: 24px; padding: 55px 45px; text-align: center;
         box-shadow: 0 12px 45px rgba(22, 119, 255, 0.09);
         border: 1px solid #dbeafe; margin-bottom: 30px;
     }
-    .welcome-title { font-size: 40px !important; font-weight: 900 !important; color: #1677ff !important; margin-bottom: 16px; }
-    .welcome-subtitle { font-size: 19px !important; color: #64748b !important; margin-bottom: 45px; }
+    .welcome-card * {
+        color: #0f172a !important;
+        -webkit-text-fill-color: #0f172a !important;
+    }
+    .welcome-title { font-size: 40px !important; font-weight: 900 !important; color: #0b2f6b !important; -webkit-text-fill-color: #0b2f6b !important; margin-bottom: 16px; }
+    .welcome-subtitle { font-size: 19px !important; color: #334155 !important; -webkit-text-fill-color: #334155 !important; margin-bottom: 45px; }
     .welcome-features { display: flex; justify-content: center; gap: 22px; flex-wrap: wrap; margin-bottom: 45px; }
     .feature-box {
         background: white; padding: 24px 32px; border-radius: 18px;
@@ -231,11 +235,12 @@ st.markdown("""
     }
     .feature-box:hover { transform: translateY(-6px); }
     .feature-icon { font-size: 26px; margin-bottom: 12px; display: block;}
-    .feature-title { font-size: 19px; font-weight: 700; color: #333 !important; margin-bottom: 9px; display: block; }
-    .feature-desc { font-size: 14.5px; color: #64748b !important; line-height: 1.55; display: block;}
+    .feature-title { font-size: 19px; font-weight: 700; color: #0f172a !important; -webkit-text-fill-color: #0f172a !important; margin-bottom: 9px; display: block; }
+    .feature-desc { font-size: 14.5px; color: #475569 !important; -webkit-text-fill-color: #475569 !important; line-height: 1.55; display: block;}
     .welcome-action {
         background: linear-gradient(135deg, #1677ff 0%, #4d94ff 100%);
-        color: white !important; padding: 14px 34px; border-radius: 32px;
+        color: white !important; -webkit-text-fill-color: white !important;
+        padding: 14px 34px; border-radius: 32px;
         font-size: 17px; font-weight: 600; display: inline-block;
         box-shadow: 0 7px 22px rgba(22, 119, 255, 0.3);
     }
@@ -340,18 +345,18 @@ with tab4:
                             st.session_state.ai_result = None
     with col_result:
         if st.session_state.ai_result is None:
-            st.markdown(f'<div style="background:white; border: 2px dashed #cbd5e1; border-radius: 14px; height: 230px; display:flex; align-items:center; justify-content:center;"><span style="color:#94a3b8 !important;">{t["res_empty"]}</span></div>', unsafe_allow_html=True)
+            st.markdown(f'<div style="background:white; border: 2px dashed #cbd5e1; border-radius: 14px; height: 230px; display:flex; align-items:center; justify-content:center;"><span style="color:#94a3b8 !important; -webkit-text-fill-color:#94a3b8 !important;">{t["res_empty"]}</span></div>', unsafe_allow_html=True)
         else:
             res = st.session_state.ai_result
             color = "#ff4d4f" if res['type'] == 'danger' else ("#faad14" if res['type'] == 'warn' else "#52c41a")
             html_card = f'''
             <div style="background: white; border-radius: 14px; padding: 26px; box-shadow: 0 5px 18px rgba(0,0,0,0.06); border-left: 9px solid {color}; min-height: 230px;">
-                <div style="font-size: 23px; font-weight: bold; color: {color} !important; margin-bottom: 12px;">{res["tip"]}</div>
-                <div style="font-size: 21px; font-weight: bold; color: #333 !important; margin-bottom: 16px;">{st.session_state.ai_item}</div>
-                <div style="font-size: 16px; line-height: 1.65; color: #555 !important;">{res["desc"]}</div>
+                <div style="font-size: 23px; font-weight: bold; color: {color} !important; -webkit-text-fill-color:{color} !important; margin-bottom: 12px;">{res["tip"]}</div>
+                <div style="font-size: 21px; font-weight: bold; color: #333 !important; -webkit-text-fill-color:#333 !important; margin-bottom: 16px;">{st.session_state.ai_item}</div>
+                <div style="font-size: 16px; line-height: 1.65; color: #555 !important; -webkit-text-fill-color:#555 !important;">{res["desc"]}</div>
                 <div style="background: #f8fafc; padding: 16px; border-radius: 10px; margin-top: 22px; border: 1px solid #e2e8f0;">
-                    <div style="font-size: 14px; font-weight: 700; color: #1677ff !important; margin-bottom: 6px;">{t["res_basis"]}</div>
-                    <div style="font-size: 14px; color: #555 !important;">{t["basis_note"]}</div>
+                    <div style="font-size: 14px; font-weight: 700; color: #1677ff !important; -webkit-text-fill-color:#1677ff !important; margin-bottom: 6px;">{t["res_basis"]}</div>
+                    <div style="font-size: 14px; color: #555 !important; -webkit-text-fill-color:#555 !important;">{t["basis_note"]}</div>
                 </div>
             </div>
             '''
