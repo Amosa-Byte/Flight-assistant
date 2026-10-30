@@ -256,15 +256,11 @@ with tab4:
 # ================= 乘机常识 =================
 
 with tab5:
-    st.markdown(f'
-
-{t["tips_title"]}', unsafe_allow_html=True)
+    st.markdown(f'{t["tips_title"]}', unsafe_allow_html=True)
     col_t1, col_t2 = st.columns(2, gap="medium")
     with col_t1:
-        st.markdown(f'{t["tips_q1"]}  
-{t["tips_a1"]}', unsafe_allow_html=True)
+        st.markdown(f'{t["tips_q1"]}  {t["tips_a1"]}', unsafe_allow_html=True)
     with col_t2:
-        st.markdown(f'{t["tips_q2"]}  
-{t["tips_a2"]}', unsafe_allow_html=True)
+        st.markdown(f'{t["tips_q2"]}  {t["tips_a2"]}', unsafe_allow_html=True)
     st.markdown(f'{t["tips_q3"]}  
 {t["tips_a3"]}', unsafe_allow_html=True)
