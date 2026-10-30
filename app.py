@@ -187,7 +187,6 @@ with st.container(border=True):
     # 底部引导语
     st.markdown(f"<div style='text-align: center; color: #1677ff; font-weight: bold; font-size: 18px;'>{t['welcome_action']}</div>", unsafe_allow_html=True)
     st.write("")
-```
 
 # ================= 乘机流程 =================
 
