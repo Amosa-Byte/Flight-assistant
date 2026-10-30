@@ -157,9 +157,7 @@ with col_lang:
         st.session_state.lang = "en" if st.session_state.lang == "zh" else "zh"
         st.rerun()
 
-st.markdown(f'
-
-{t["hero_title"]}{t["hero_desc"]}{t["hero_tag1"]}{t["hero_tag2"]}{t["hero_tag3"]}', unsafe_allow_html=True)
+st.markdown(f'{t["hero_title"]}{t["hero_desc"]}{t["hero_tag1"]}{t["hero_tag2"]}{t["hero_tag3"]}', unsafe_allow_html=True)
 
 tab1, tab2, tab3, tab4, tab5 = st.tabs([t["tab_home"], t["tab_process"], t["tab_luggage"], t["tab_ai"], t["tab_tips"]])
 
