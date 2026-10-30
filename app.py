@@ -2,11 +2,11 @@ import streamlit as st
 import requests
 import json
 
-# 1. 开启宽屏模式 (核心)
+# 1. 开启宽屏模式
 st.set_page_config(page_title="飞行随身查", page_icon="✈️", layout="wide")
 
 # ==========================================
-# 🌐 多语言字典 (补充了参考图里的新文案)
+# 🌐 多语言字典
 # ==========================================
 texts = {
     "zh": {
@@ -20,13 +20,11 @@ texts = {
         "feat2": "快速查询\n即刻获取结果",
         "feat3": "安心启程\n让旅途更轻松",
         
-        # Tabs
         "tab1": "快速查询",
         "tab2": "物品资料库",
         "tab3": "规则说明",
         "tab4": "最近查询",
         
-        # 表单
         "form_title": "查一下这件物品",
         "form_desc": "选择航线、输入名称与规格，快速获取携带建议。",
         "route_label": "航线类型",
@@ -42,7 +40,6 @@ texts = {
         "carry_2": "托运行李",
         "btn_search": "立即查询",
         
-        # 结果
         "res_empty": "请在左侧输入物品信息并点击查询",
         "res_ok": "✅ 可以携带",
         "res_warn": "⚠️ 限量携带",
@@ -52,8 +49,8 @@ texts = {
         "res_btn_copy": "复制结果文字",
         "res_tip": "结果仅供参考，最终以出发机场安检、承运航空公司目的地海关要求为准。",
         
-        # AI Prompt
-        "ai_prompt": "你是一个专业的航空安检专家。请根据物品：{item}，容量：{cap}，航线：{route}。判断能否带上飞机。必须严格返回纯JSON格式：{\"type\": \"danger/warn/ok\", \"tip\": \"一句话结论\", \"desc\": \"详细解释，说明托运和随身要求\"}"
+        # 注意这里：不用大括号，用 [item] 代替
+        "ai_prompt": "你是一个专业的航空安检专家。请根据物品：[item]，容量：[cap]，航线：[route]。判断能否带上飞机。必须严格返回纯JSON格式：{\"type\": \"danger/warn/ok\", \"tip\": \"一句话结论\", \"desc\": \"详细解释，说明托运和随身要求\"}"
     },
     "en": {
         "app_title": "Flight Carry-On Checker",
@@ -95,7 +92,7 @@ texts = {
         "res_btn_copy": "Copy Text",
         "res_tip": "For reference only. Final decision rests with security and airline.",
         
-        "ai_prompt": "You are a professional aviation security expert. Based on item: {item}, capacity: {cap}, route: {route}. Judge if it can be brought on a plane. You MUST return strictly in JSON format: {\"type\": \"danger/warn/ok\", \"tip\": \"One sentence conclusion\", \"desc\": \"Detailed explanation for carry-on and checked\"}"
+        "ai_prompt": "You are a professional aviation security expert. Based on item: [item], capacity: [cap], route: [route]. Judge if it can be brought on a plane. You MUST return strictly in JSON format: {\"type\": \"danger/warn/ok\", \"tip\": \"One sentence conclusion\", \"desc\": \"Detailed explanation for carry-on and checked\"}"
     }
 }
 
@@ -108,24 +105,36 @@ if "search_item" not in st.session_state:
 
 t = texts[st.session_state.lang]
 
-# 安全读取 Key
 if "MY_API_KEY" in st.secrets:
     MY_API_KEY = st.secrets["MY_API_KEY"]
 else:
     MY_API_KEY = "本地测试Key"
 
 # ==========================================
-# 🎨 注入宽屏专属 CSS
+# 🎨 注入宽屏专属 CSS (强力修复深色模式)
 # ==========================================
 st.markdown("""
 <style>
-    /* 移除 Streamlit 默认留白，改为宽屏布局 */
     .block-container { max-width: 1200px !important; padding-top: 1rem !important; }
     header {visibility: hidden;} footer {visibility: hidden;}
+    .stApp { background-color: #f8fafc !important; }
     
-    /* 背景色 */
-    .stApp { background-color: #f8fafc; }
-    
+    /* 强制锁定文字颜色为深色 */
+    p, h1, h2, h3, h4, h5, h6, span, div {
+        color: #333333 !important;
+        -webkit-text-fill-color: #333333 !important;
+    }
+    .hero-box p, .hero-box span, .hero-box div {
+        color: white !important;
+        -webkit-text-fill-color: white !important;
+    }
+
+    /* 修复单选按钮文字颜色 */
+    div[data-testid="stRadio"] label p {
+        color: #333 !important;
+        -webkit-text-fill-color: #333 !important;
+    }
+
     /* 隐藏原生 Tab 边框，改成胶囊样式 */
     button[data-baseweb="tab"] {
         background-color: transparent !important;
@@ -142,24 +151,18 @@ st.markdown("""
     }
     button[data-baseweb="tab"] p {
         color: #666 !important;
+        -webkit-text-fill-color: #666 !important;
         font-weight: 500 !important;
         font-size: 15px !important;
     }
     div[data-baseweb="tab-highlight"] { display: none; }
     
-    /* Hero Banner 区域 */
+    /* Hero Banner */
     .hero-box {
         background: linear-gradient(105deg, #1677ff 0%, #4d94ff 100%);
-        border-radius: 16px;
-        padding: 40px 50px;
-        color: white;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin-bottom: 25px;
-        box-shadow: 0 10px 30px rgba(22, 119, 255, 0.15);
-        position: relative;
-        overflow: hidden;
+        border-radius: 16px; padding: 40px 50px; color: white;
+        display: flex; justify-content: space-between; align-items: center;
+        margin-bottom: 25px; box-shadow: 0 10px 30px rgba(22, 119, 255, 0.15);
     }
     .hero-text { z-index: 2; max-width: 600px; }
     .hero-tag { font-size: 12px; letter-spacing: 2px; font-weight: bold; opacity: 0.8; margin-bottom: 15px; }
@@ -169,38 +172,38 @@ st.markdown("""
     .feat-item { font-size: 14px; font-weight: bold; display: flex; flex-direction: column; gap: 4px; white-space: pre-line;}
     .feat-item span { font-size: 12px; font-weight: normal; opacity: 0.8; }
     
-    /* 左侧表单卡片 */
-    .form-card {
-        background: white; border-radius: 16px; padding: 30px;
+    /* 表单卡片与结果卡片 */
+    .form-card, .result-card {
+        background: white !important; border-radius: 16px; padding: 30px;
         box-shadow: 0 4px 20px rgba(0,0,0,0.04);
     }
-    .form-title { font-size: 22px; font-weight: bold; color: #333; margin-bottom: 5px; }
-    .form-desc { font-size: 14px; color: #888; margin-bottom: 25px; }
+    .form-title { font-size: 22px; font-weight: bold; color: #333 !important; margin-bottom: 5px; }
+    .form-desc { font-size: 14px; color: #888 !important; margin-bottom: 25px; }
     
-    /* 覆盖输入框和按钮样式 */
-    div[data-testid="stTextInput"] input, div[data-testid="stNumberInput"] input {
+    /* 强制输入框白底黑字 */
+    div[data-testid="stTextInput"] input {
         border-radius: 10px !important; border: 1px solid #e2e8f0 !important;
         padding: 12px 15px !important; font-size: 15px !important;
+        background-color: #ffffff !important;
+        color: #333333 !important;
+        -webkit-text-fill-color: #333333 !important;
     }
+    
     button[kind="primary"] {
         background: #1677ff !important; border-radius: 10px !important;
         height: 45px !important; font-weight: bold !important;
     }
     
-    /* 右侧结果卡片 */
-    .result-card {
-        background: white; border-radius: 16px; padding: 30px;
-        box-shadow: 0 4px 20px rgba(0,0,0,0.04);
-        min-height: 400px;
-    }
-    .tag-ok { background: #dcfce7; color: #166534; padding: 4px 12px; border-radius: 20px; font-size: 13px; font-weight: bold; display: inline-block; margin-bottom: 15px;}
-    .tag-warn { background: #fef08a; color: #854d0e; padding: 4px 12px; border-radius: 20px; font-size: 13px; font-weight: bold; display: inline-block; margin-bottom: 15px;}
-    .tag-danger { background: #fee2e2; color: #991b1b; padding: 4px 12px; border-radius: 20px; font-size: 13px; font-weight: bold; display: inline-block; margin-bottom: 15px;}
-    .res-title { font-size: 24px; font-weight: bold; color: #333; margin-bottom: 10px; }
-    .res-desc { font-size: 15px; color: #555; line-height: 1.6; margin-bottom: 25px; }
+    /* 结果卡片内部 */
+    .result-card { min-height: 400px; }
+    .tag-ok { background: #dcfce7; color: #166534 !important; padding: 4px 12px; border-radius: 20px; font-size: 13px; font-weight: bold; display: inline-block; margin-bottom: 15px;}
+    .tag-warn { background: #fef08a; color: #854d0e !important; padding: 4px 12px; border-radius: 20px; font-size: 13px; font-weight: bold; display: inline-block; margin-bottom: 15px;}
+    .tag-danger { background: #fee2e2; color: #991b1b !important; padding: 4px 12px; border-radius: 20px; font-size: 13px; font-weight: bold; display: inline-block; margin-bottom: 15px;}
+    .res-title { font-size: 24px; font-weight: bold; color: #333 !important; margin-bottom: 10px; }
+    .res-desc { font-size: 15px; color: #555 !important; line-height: 1.6; margin-bottom: 25px; }
     
     .basis-box { background: #f8fafc; border-radius: 10px; padding: 20px; margin-bottom: 25px; border: 1px solid #f1f5f9;}
-    .basis-title { font-size: 14px; font-weight: bold; color: #1677ff; margin-bottom: 10px; }
+    .basis-title { font-size: 14px; font-weight: bold; color: #1677ff !important; margin-bottom: 10px; }
 </style>
 """, unsafe_allow_html=True)
 
@@ -216,10 +219,10 @@ with col_lang:
         st.session_state.lang = "en" if st.session_state.lang == "zh" else "zh"
         st.rerun()
 
-st.write("") # 占位
+st.write("")
 
 # ==========================================
-# 🚀 Hero 横幅 (左侧文字，右侧占位图)
+# 🚀 Hero 横幅
 # ==========================================
 st.markdown(f"""
 <div class="hero-box">
@@ -236,14 +239,12 @@ st.markdown(f"""
 </div>
 """, unsafe_allow_html=True)
 
-
 # ==========================================
 # 🚀 核心 Tabs 区域
 # ==========================================
 tab1, tab2, tab3, tab4 = st.tabs([t["tab1"], t["tab2"], t["tab3"], t["tab4"]])
 
 with tab1:
-    # 左右分栏布局 (左表单 1.2 : 右结果 1)
     col_left, col_right = st.columns([1.2, 1], gap="large")
 
     # ---------- 左侧：查询表单 ----------
@@ -255,36 +256,33 @@ with tab1:
         </div>
         """, unsafe_allow_html=True)
         
-        # 航线选择
         st.write(t["route_label"])
         route = st.radio("route", [t["route_1"], t["route_2"], t["route_3"]], horizontal=True, label_visibility="collapsed")
         
-        # 物品和容量
         item_name = st.text_input(t["item_label"], placeholder=t["item_ph"])
         
         col_cap, col_unit = st.columns([3, 1])
         with col_cap:
             capacity = st.text_input(t["capacity_label"], placeholder=t["capacity_ph"])
         with col_unit:
-            st.write(" ") # 占位
+            st.write(" ") 
             st.write("ml")
             
-        # 携带方式
         st.write(t["carry_label"])
         carry_method = st.radio("carry", [t["carry_1"], t["carry_2"]], horizontal=True, label_visibility="collapsed")
         
         st.write("")
-        # 查询按钮
         if st.button(t["btn_search"], type="primary", use_container_width=True):
             if not item_name:
                 st.warning("请输入物品名称")
             else:
                 with st.spinner("AI 正在判断中..."):
-                    # 准备请求
                     url = 'https://open.bigmodel.cn/api/paas/v4/chat/completions'
                     headers = {'Content-Type': 'application/json', 'Authorization': f'Bearer {MY_API_KEY}'}
                     
-                    prompt = t["ai_prompt"].format(item=item_name, cap=capacity, route=route)
+                    # 使用 replace 避免花括号报错
+                    prompt = t["ai_prompt"].replace("[item]", item_name).replace("[cap]", capacity).replace("[route]", route)
+                    
                     data = {
                         "model": "glm-4-flash",
                         "messages": [{"role": "system", "content": prompt}],
@@ -297,7 +295,6 @@ with tab1:
                         ai_text = ai_text.replace('```json', '').replace('```', '').strip()
                         result = json.loads(ai_text)
                         
-                        # 保存到 session_state
                         st.session_state.search_result = result
                         st.session_state.search_item = f"{item_name} · {capacity}ml"
                     except Exception as e:
@@ -306,14 +303,12 @@ with tab1:
     # ---------- 右侧：结果展示 ----------
     with col_right:
         if st.session_state.search_result is None:
-            # 空状态
             st.markdown(f"""
             <div class="result-card" style="display:flex; align-items:center; justify-content:center;">
                 <div style="color:#94a3b8; font-size:15px;">{t['res_empty']}</div>
             </div>
             """, unsafe_allow_html=True)
         else:
-            # 渲染结果
             res = st.session_state.search_result
             item_title = st.session_state.search_item
             
