@@ -118,7 +118,6 @@ texts = {
     "tips_q2": "Q: What if I lose my ID?", "tips_a2": "Apply for a temporary boarding certificate at the airport police office.",
     "tips_q3": "Q: How much liquid can I bring?", "tips_a3": "Carry-on: <=100ml per bottle, <=1L total, in a clear bag."
 }
-```
 
 }
 
