@@ -20,7 +20,6 @@ texts = {
         "tab_ai": "AI 安检",
         "tab_tips": "乘机常识",
 
-```
     "hero_title": "让安检不再是盲盒，出行更从容。",
     "hero_desc": "基于大模型实时推理，精准解答随身携带与托运规则。",
     "hero_tag1": "航空级标准",
@@ -169,7 +168,7 @@ tab1, tab2, tab3, tab4, tab5 = st.tabs([t["tab_home"], t["tab_process"], t["tab_
 with tab1:
     st.write("")
 
-```
+
 # 使用 + 拼接，绝对防错
 welcome_html = '<div class="welcome-card">'
 welcome_html += '<div class="welcome-title">' + t["welcome_title"] + '</div>'
@@ -199,14 +198,12 @@ welcome_html += '<div class="welcome-action">' + t["welcome_action"] + '</div>'
 welcome_html += '</div>'
 
 st.markdown(welcome_html, unsafe_allow_html=True)
-```
+
 
 # ================= 乘机流程 =================
 
 with tab2:
-    st.markdown(f'
-
-{t["process_title"]}', unsafe_allow_html=True)
+    st.markdown(f'{t["process_title"]}', unsafe_allow_html=True)
     col_p1, col_p2 = st.columns(2, gap="medium")
     with col_p1:
         st.markdown(f'{t["p1_t"]}{t["p1_d"]}', unsafe_allow_html=True)
@@ -218,9 +215,7 @@ with tab2:
 # ================= 行李规定 =================
 
 with tab3:
-    st.markdown(f'
-
-{t["lug_title"]}', unsafe_allow_html=True)
+    st.markdown(f'{t["lug_title"]}', unsafe_allow_html=True)
     col_l1, col_l2 = st.columns(2, gap="medium")
     with col_l1:
         st.markdown(f'{t["lug_carry_t"]}{t["lug_carry_d"]}', unsafe_allow_html=True)
@@ -230,9 +225,7 @@ with tab3:
 # ================= AI 安检 =================
 
 with tab4:
-    st.markdown(f'
-
-{t["ai_title"]}', unsafe_allow_html=True)
+    st.markdown(f'{t["ai_title"]}', unsafe_allow_html=True)
     st.markdown(f'{t["ai_desc"]}', unsafe_allow_html=True)
     col_input, col_result = st.columns([1, 1.2], gap="large")
     with col_input:
@@ -275,15 +268,10 @@ with tab4:
 # ================= 乘机常识 =================
 
 with tab5:
-    st.markdown(f'
-
-{t["tips_title"]}', unsafe_allow_html=True)
+    st.markdown(f'{t["tips_title"]}', unsafe_allow_html=True)
     col_t1, col_t2 = st.columns(2, gap="medium")
     with col_t1:
-        st.markdown(f'{t["tips_q1"]}  
-{t["tips_a1"]}', unsafe_allow_html=True)
+        st.markdown(f'{t["tips_q1"]}  {t["tips_a1"]}', unsafe_allow_html=True)
     with col_t2:
-        st.markdown(f'{t["tips_q2"]}  
-{t["tips_a2"]}', unsafe_allow_html=True)
-    st.markdown(f'{t["tips_q3"]}  
-{t["tips_a3"]}', unsafe_allow_html=True)
+        st.markdown(f'{t["tips_q2"]}  {t["tips_a2"]}', unsafe_allow_html=True)
+    st.markdown(f'{t["tips_q3"]}  {t["tips_a3"]}', unsafe_allow_html=True)
