@@ -19,8 +19,7 @@ texts = {
         "tab_luggage": "行李规定",
         "tab_ai": "AI 安检",
         "tab_tips": "乘机常识",
-
-```
+        
     "hero_title": "让安检不再是盲盒，出行更从容。",
     "hero_desc": "基于大模型实时推理，精准解答随身携带与托运规则。",
     "hero_tag1": "航空级标准",
