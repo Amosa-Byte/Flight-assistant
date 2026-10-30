@@ -19,13 +19,14 @@ texts = {
         "tab_luggage": "行李规定",
         "tab_ai": "AI 安检",
         "tab_tips": "乘机常识",
-
+        
     "hero_title": "让安检不再是盲盒，出行更从容。",
     "hero_desc": "基于大模型实时推理，精准解答随身携带与托运规则。",
     "hero_tag1": "航空级标准",
     "hero_tag2": "极速 AI 响应",
     "hero_tag3": "安心伴飞",
     
+    # 首页美化文案
     "welcome_title": "👋 欢迎使用乘机流程助手",
     "welcome_subtitle": "您的随身航空出行管家，一站式解答所有乘机疑问。",
     "feat1_t": "🔍 AI 安检查询",
@@ -118,7 +119,6 @@ texts = {
     "tips_q3": "Q: How much liquid can I bring?", "tips_a3": "Carry-on: <=100ml per bottle, <=1L total, in a clear bag."
 }
 
-
 }
 
 if "lang" not in st.session_state:
@@ -137,7 +137,7 @@ else:
 
 # ==========================================
 
-# 🎨 CSS 样式 (增加首页高级卡片)
+# 🎨 CSS 样式
 
 # ==========================================
 
@@ -157,7 +157,8 @@ with col_lang:
         st.session_state.lang = "en" if st.session_state.lang == "zh" else "zh"
         st.rerun()
 
-st.markdown(f'{t["hero_title"]}{t["hero_desc"]}{t["hero_tag1"]}{t["hero_tag2"]}{t["hero_tag3"]}', unsafe_allow_html=True)
+st.markdown(f'{t["hero_title"]}{t["hero_desc"]}{t["hero_tag1"]}{t["hero_tag2"]}{t["hero_tag3"]}',
+            unsafe_allow_html=True)
 
 tab1, tab2, tab3, tab4, tab5 = st.tabs([t["tab_home"], t["tab_process"], t["tab_luggage"], t["tab_ai"], t["tab_tips"]])
 
@@ -165,38 +166,27 @@ tab1, tab2, tab3, tab4, tab5 = st.tabs([t["tab_home"], t["tab_process"], t["tab_
 
 with tab1:
     st.write("")
-
-
-# 使用 + 拼接，绝对防错
-welcome_html = '<div class="welcome-card">'
-welcome_html += '<div class="welcome-title">' + t["welcome_title"] + '</div>'
-welcome_html += '<div class="welcome-subtitle">' + t["welcome_subtitle"] + '</div>'
-welcome_html += '<div class="welcome-features">'
-
-welcome_html += '<div class="feature-box">'
-welcome_html += '<span class="feature-icon">🔍</span>'
-welcome_html += '<span class="feature-title">' + t["feat1_t"] + '</span>'
-welcome_html += '<span class="feature-desc">' + t["feat1_d"] + '</span>'
-welcome_html += '</div>'
-
-welcome_html += '<div class="feature-box">'
-welcome_html += '<span class="feature-icon">🧳</span>'
-welcome_html += '<span class="feature-title">' + t["feat2_t"] + '</span>'
-welcome_html += '<span class="feature-desc">' + t["feat2_d"] + '</span>'
-welcome_html += '</div>'
-
-welcome_html += '<div class="feature-box">'
-welcome_html += '<span class="feature-icon">✈️</span>'
-welcome_html += '<span class="feature-title">' + t["feat3_t"] + '</span>'
-welcome_html += '<span class="feature-desc">' + t["feat3_d"] + '</span>'
-welcome_html += '</div>'
-
-welcome_html += '</div>'
-welcome_html += '<div class="welcome-action">' + t["welcome_action"] + '</div>'
-welcome_html += '</div>'
-
-st.markdown(welcome_html, unsafe_allow_html=True)
-
+    st.write("")
+# 使用容器构建欢迎面板
+with st.container(border=True):
+    # 居中大标题
+    st.markdown(f"<h1 style='text-align: center; color: #1677ff !important; font-size: 36px !important; margin-bottom: 0;'>{t['welcome_title']}</h1>", unsafe_allow_html=True)
+    st.markdown(f"<p style='text-align: center; color: #64748b !important; font-size: 16px !important; margin-top: 8px; margin-bottom: 30px;'>{t['welcome_subtitle']}</p>", unsafe_allow_html=True)
+    
+    # 三列功能简介卡片
+    c1, c2, c3 = st.columns(3, gap="medium")
+    with c1:
+        st.info(f"**{t['feat1_t']}**\n\n{t['feat1_d']}")
+    with c2:
+        st.success(f"**{t['feat2_t']}**\n\n{t['feat2_d']}")
+    with c3:
+        st.warning(f"**{t['feat3_t']}**\n\n{t['feat3_d']}")
+        
+    st.write("")
+    st.write("")
+    # 底部引导语
+    st.markdown(f"<div style='text-align: center; color: #1677ff; font-weight: bold; font-size: 18px;'>{t['welcome_action']}</div>", unsafe_allow_html=True)
+    st.write("")
 
 # ================= 乘机流程 =================
 
