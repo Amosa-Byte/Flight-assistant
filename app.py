@@ -6,7 +6,7 @@ st.set_page_config(page_title="乘机流程助手", page_icon="✈️", layout="
 
 # ==========================================
 
-# 文字字典 (已彻底修复双引号嵌套问题)
+# 文字字典
 
 # ==========================================
 
@@ -91,7 +91,7 @@ texts = {
         "ai_spin": "AI is thinking...",
         "ai_warn": "Please enter an item name!",
         "ai_err": "Failed! Error: ",
-        "ai_prompt": "You are a professional aviation security expert. Judge if the item can be brought on a plane. You MUST return strictly in raw JSON format without markdown blocks. The JSON must contain exactly three keys: type (must be danger, warn, or ok), tip (one sentence conclusion), and desc (detailed explanation).",
+        "ai_prompt": "You are a professional aviation security expert. Judge if the item can be brought on a plane. You MUST return strictly in JSON format: {"type": "danger/warn/ok", "tip": "One sentence conclusion", "desc": "Detailed explanation"}",
         "res_empty": "Enter an item on the left and click Search",
         "res_basis": "Basis",
         "tips_title": "Travel Tips",
@@ -127,7 +127,7 @@ st.markdown("""
 
 # ==========================================
 
-# 页面渲染
+# 页面渲染 (全部改为 + 号拼接，绝对防错)
 
 # ==========================================
 
@@ -137,18 +137,32 @@ with col_lang:
         st.session_state.lang = "en" if st.session_state.lang == "zh" else "zh"
         st.rerun()
 
-st.markdown(f'
+# 顶部横幅
 
-{t["hero_title"]}{t["hero_desc"]}{t["hero_tag1"]}{t["hero_tag2"]}{t["hero_tag3"]}', unsafe_allow_html=True)
+banner_html = '
+
+'
+banner_html += '' + t["hero_title"] + ''
+banner_html += '' + t["hero_desc"] + ''
+banner_html += ''
+banner_html += '' + t["hero_tag1"] + ''
+banner_html += '' + t["hero_tag2"] + ''
+banner_html += '' + t["hero_tag3"] + ''
+banner_html += ''
+st.markdown(banner_html, unsafe_allow_html=True)
 
 tab1, tab2, tab3, tab4, tab5 = st.tabs([t["tab_home"], t["tab_process"], t["tab_luggage"], t["tab_ai"], t["tab_tips"]])
 
+# ================= 1. 首页 =================
+
 with tab1:
-    welcome_html = f'
+    welcome_html = '
 
-## {t["welcome_title"]}
+'
+    welcome_html += '## ' + t["welcome_title"] + '
 
-{t["welcome_desc"]}
+'
+    welcome_html += '' + t["welcome_desc"] + '
 
 '
     st.markdown(welcome_html, unsafe_allow_html=True)
@@ -156,43 +170,49 @@ with tab1:
 ```
 col_f1, col_f2, col_f3 = st.columns(3)
 with col_f1:
-    st.markdown(f'<div class="text-card" style="text-align: center; padding: 30px 15px;"><b style="font-size: 18px;">{t["feat1"]}</b></div>', unsafe_allow_html=True)
+    st.markdown('<div class="text-card" style="text-align: center; padding: 30px 15px;"><b style="font-size: 18px;">' + t["feat1"] + '</b></div>', unsafe_allow_html=True)
 with col_f2:
-    st.markdown(f'<div class="text-card" style="text-align: center; padding: 30px 15px;"><b style="font-size: 18px;">{t["feat2"]}</b></div>', unsafe_allow_html=True)
+    st.markdown('<div class="text-card" style="text-align: center; padding: 30px 15px;"><b style="font-size: 18px;">' + t["feat2"] + '</b></div>', unsafe_allow_html=True)
 with col_f3:
-    st.markdown(f'<div class="text-card" style="text-align: center; padding: 30px 15px;"><b style="font-size: 18px;">{t["feat3"]}</b></div>', unsafe_allow_html=True)
+    st.markdown('<div class="text-card" style="text-align: center; padding: 30px 15px;"><b style="font-size: 18px;">' + t["feat3"] + '</b></div>', unsafe_allow_html=True)
     
 st.write("")
 st.info(t["home_tip"])
 ```
 
-with tab2:
-    st.markdown(f'
+# ================= 2. 流程 =================
 
-{t["process_title"]}', unsafe_allow_html=True)
+with tab2:
+    st.markdown('
+
+' + t["process_title"] + '', unsafe_allow_html=True)
     col_p1, col_p2 = st.columns(2, gap="medium")
     with col_p1:
-        st.markdown(f'{t["p1_t"]}{t["p1_d"]}', unsafe_allow_html=True)
-        st.markdown(f'{t["p3_t"]}{t["p3_d"]}', unsafe_allow_html=True)
+        st.markdown('' + t["p1_t"] + '' + t["p1_d"] + '', unsafe_allow_html=True)
+        st.markdown('' + t["p3_t"] + '' + t["p3_d"] + '', unsafe_allow_html=True)
     with col_p2:
-        st.markdown(f'{t["p2_t"]}{t["p2_d"]}', unsafe_allow_html=True)
-        st.markdown(f'{t["p4_t"]}{t["p4_d"]}', unsafe_allow_html=True)
+        st.markdown('' + t["p2_t"] + '' + t["p2_d"] + '', unsafe_allow_html=True)
+        st.markdown('' + t["p4_t"] + '' + t["p4_d"] + '', unsafe_allow_html=True)
+
+# ================= 3. 行李 =================
 
 with tab3:
-    st.markdown(f'
+    st.markdown('
 
-{t["lug_title"]}', unsafe_allow_html=True)
+' + t["lug_title"] + '', unsafe_allow_html=True)
     col_l1, col_l2 = st.columns(2, gap="medium")
     with col_l1:
-        st.markdown(f'{t["lug_carry_t"]}{t["lug_carry_d"]}', unsafe_allow_html=True)
+        st.markdown('' + t["lug_carry_t"] + '' + t["lug_carry_d"] + '', unsafe_allow_html=True)
     with col_l2:
-        st.markdown(f'{t["lug_check_t"]}{t["lug_check_d"]}', unsafe_allow_html=True)
+        st.markdown('' + t["lug_check_t"] + '' + t["lug_check_d"] + '', unsafe_allow_html=True)
+
+# ================= 4. AI 安检 =================
 
 with tab4:
-    st.markdown(f'
+    st.markdown('
 
-{t["ai_title"]}', unsafe_allow_html=True)
-    st.markdown(f'{t["ai_desc"]}', unsafe_allow_html=True)
+' + t["ai_title"] + '', unsafe_allow_html=True)
+    st.markdown('' + t["ai_desc"] + '', unsafe_allow_html=True)
     col_input, col_result = st.columns([1, 1.2], gap="large")
     with col_input:
         with st.container(border=True):
@@ -205,10 +225,10 @@ with tab4:
                 else:
                     with st.spinner(t["ai_spin"]):
                         url = '[https://open.bigmodel.cn/api/paas/v4/chat/completions](https://open.bigmodel.cn/api/paas/v4/chat/completions)'
-                        headers = {'Content-Type': 'application/json', 'Authorization': f'Bearer {MY_API_KEY}'}
+                        headers = {'Content-Type': 'application/json', 'Authorization': 'Bearer ' + MY_API_KEY}
                         data = {
                             "model": "glm-4-flash",
-                            "messages": [{"role": "system", "content": t["ai_prompt"]}, {"role": "user", "content": f"请判断：{item}"}],
+                            "messages": [{"role": "system", "content": t["ai_prompt"]}, {"role": "user", "content": "请判断：" + item}],
                             "temperature": 0.1,
                             "top_p": 0.7
                         }
@@ -220,27 +240,41 @@ with tab4:
                             st.session_state.ai_result = json.loads(ai_text)
                             st.session_state.ai_item = item
                         except Exception as e:
-                            st.error(f"{t['ai_err']} {e}")
+                            st.error(t['ai_err'] + str(e))
                             st.session_state.ai_result = None
     with col_result:
         if st.session_state.ai_result is None:
-            st.markdown(f'{t["res_empty"]}', unsafe_allow_html=True)
+            empty_html = '' + t["res_empty"] + ''
+            st.markdown(empty_html, unsafe_allow_html=True)
         else:
             res = st.session_state.ai_result
             color = "#ff4d4f" if res['type'] == 'danger' else ("#faad14" if res['type'] == 'warn' else "#52c41a")
-            html_card = f'{res["tip"]}{st.session_state.ai_item}{res["desc"]}{t["res_basis"]}依据民航局安检规定，具体以机场现场为准。'
-            st.markdown(html_card, unsafe_allow_html=True)
+
+```
+        card_html = '<div style="background: white; border-radius: 12px; padding: 25px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); border-left: 8px solid ' + color + '; min-height: 220px;">'
+        card_html += '<div style="font-size: 22px; font-weight: bold; color: ' + color + ' !important; margin-bottom: 10px;">' + res["tip"] + '</div>'
+        card_html += '<div style="font-size: 20px; font-weight: bold; color: #333 !important; margin-bottom: 15px;">' + st.session_state.ai_item + '</div>'
+        card_html += '<div style="font-size: 16px; line-height: 1.6; color: #555 !important;">' + res["desc"] + '</div>'
+        card_html += '<div style="background: #f8fafc; padding: 15px; border-radius: 8px; margin-top: 20px; border: 1px solid #e2e8f0;">'
+        card_html += '<div style="font-size: 14px; font-weight: bold; color: #1677ff !important; margin-bottom: 5px;">' + t["res_basis"] + '</div>'
+        card_html += '<div style="font-size: 14px; color: #555 !important;">依据民航局安检规定，具体以机场现场为准。</div>'
+        card_html += '</div></div>'
+        
+        st.markdown(card_html, unsafe_allow_html=True)
+```
+
+# ================= 5. 常识 =================
 
 with tab5:
-    st.markdown(f'
+    st.markdown('
 
-{t["tips_title"]}', unsafe_allow_html=True)
+' + t["tips_title"] + '', unsafe_allow_html=True)
     col_t1, col_t2 = st.columns(2, gap="medium")
     with col_t1:
-        st.markdown(f'{t["tips_q1"]}  
-{t["tips_a1"]}', unsafe_allow_html=True)
+        st.markdown('' + t["tips_q1"] + '  
+' + t["tips_a1"] + '', unsafe_allow_html=True)
     with col_t2:
-        st.markdown(f'{t["tips_q2"]}  
-{t["tips_a2"]}', unsafe_allow_html=True)
-    st.markdown(f'{t["tips_q3"]}  
-{t["tips_a3"]}', unsafe_allow_html=True)
+        st.markdown('' + t["tips_q2"] + '  
+' + t["tips_a2"] + '', unsafe_allow_html=True)
+    st.markdown('' + t["tips_q3"] + '  
+' + t["tips_a3"] + '', unsafe_allow_html=True)
