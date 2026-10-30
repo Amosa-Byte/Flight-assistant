@@ -2,189 +2,354 @@ import streamlit as st
 import requests
 import json
 
-st.set_page_config(page_title="乘机流程助手", page_icon="✈️", layout="centered")
+# 1. 开启宽屏模式 (核心)
+st.set_page_config(page_title="飞行随身查", page_icon="✈️", layout="wide")
 
+# ==========================================
+# 🌐 多语言字典 (补充了参考图里的新文案)
+# ==========================================
 texts = {
     "zh": {
-        "nav_title": "乘机流程助手",
+        "app_title": "飞行随身查",
+        "app_subtitle": "Flight Carry-On Checker",
         "lang_btn": "EN",
-        "tab_home": "首页",
-        "tab_process": "流程",
-        "tab_luggage": "行李",
-        "tab_ai": "AI 安检",
-        "tab_tips": "常识",
-        "home_sub": "欢迎使用 AI 乘机助手",
-        "process_title": "国内乘机完整步骤",
-        "p1_t": "1. 值机办理", "p1_d": "提前 2 小时到机场；凭身份证换取登机牌，办理行李托运。",
-        "p2_t": "2. 安全检查", "p2_d": "携带身份证、登机牌；电子设备、充电宝单独拿出来过机安检。",
-        "p3_t": "3. 候机等待", "p3_d": "看登机牌找到对应登机口，在附近座位等候，留意登机广播。",
-        "p4_t": "4. 登机上机", "p4_d": "广播通知登机后，出示登机牌，排队登机，对号入座。",
-        "lug_title": "行李规定",
-        "lug_carry_t": "✅ 随身带上飞机（登机箱）",
-        "lug_carry_d": "1 件随身行李，尺寸 20×40×55cm 以内；重量一般 ≤5kg。<br><br>⚠️ 充电宝只能随身携带，严禁托运。",
-        "lug_check_t": "📦 托运行李",
-        "lug_check_d": "经济舱：免费托运额度 20kg；超重要额外付费。<br><br>⚠️ 锂电池、充电宝不可以放进托运行李。",
-        "ai_title": "AI 安检大脑",
-        "ai_desc": "输入任何物品，AI 为您判断能否带上飞机",
-        "ai_ph": "例如：防狼喷雾、化妆品、钢丝球、打火机",
-        "ai_btn": "立即查询",
-        "ai_spin": "AI 安检专家正在思考中...",
-        "ai_warn": "请输入物品名称！",
-        "ai_err": "查询失败！错误: ",
-        "ai_prompt": "你是一个专业的航空安检专家。请判断物品能否带上飞机。必须严格返回纯JSON格式：{\"type\": \"danger/warn/ok\", \"tip\": \"一句话结论\", \"desc\": \"详细解释\"}",
-        "tips_title": "乘机小常识",
-        "tips_q1": "Q: 什么时候到机场合适？", "tips_a1": "建议国内航班提前 2 小时，国际航班提前 3 小时。",
-        "tips_q2": "Q: 身份证丢了怎么办？", "tips_a2": "可在机场公安窗口办理临时乘机证明。",
-        "tips_q3": "Q: 液体能带多少？", "tips_a3": "随身携带单瓶≤100ml，总量≤1L，需装透明袋。"
+        "hero_tag": "TRAVEL SMART · PACK WITH CONFIDENCE",
+        "hero_title": "出发前查一查，\n让每一次出行更安心。",
+        "hero_desc": "输入物品名称和容器规格，快速获取中国大陆、港澳台及国际航线的随身携带与托运建议。",
+        "feat1": "合规出行\n基于航空规则",
+        "feat2": "快速查询\n即刻获取结果",
+        "feat3": "安心启程\n让旅途更轻松",
+        
+        # Tabs
+        "tab1": "快速查询",
+        "tab2": "物品资料库",
+        "tab3": "规则说明",
+        "tab4": "最近查询",
+        
+        # 表单
+        "form_title": "查一下这件物品",
+        "form_desc": "选择航线、输入名称与规格，快速获取携带建议。",
+        "route_label": "航线类型",
+        "route_1": "中国大陆",
+        "route_2": "港澳台",
+        "route_3": "国际",
+        "item_label": "物品名称",
+        "item_ph": "例如：眼药水、充电宝、洗面奶",
+        "capacity_label": "容器标注容量 / 规格",
+        "capacity_ph": "例如 100",
+        "carry_label": "携带方式",
+        "carry_1": "随身携带",
+        "carry_2": "托运行李",
+        "btn_search": "立即查询",
+        
+        # 结果
+        "res_empty": "请在左侧输入物品信息并点击查询",
+        "res_ok": "✅ 可以携带",
+        "res_warn": "⚠️ 限量携带",
+        "res_danger": "❌ 禁止携带",
+        "res_basis": "判断依据",
+        "res_btn_save": "保存本次查询",
+        "res_btn_copy": "复制结果文字",
+        "res_tip": "结果仅供参考，最终以出发机场安检、承运航空公司目的地海关要求为准。",
+        
+        # AI Prompt
+        "ai_prompt": "你是一个专业的航空安检专家。请根据物品：{item}，容量：{cap}，航线：{route}。判断能否带上飞机。必须严格返回纯JSON格式：{\"type\": \"danger/warn/ok\", \"tip\": \"一句话结论\", \"desc\": \"详细解释，说明托运和随身要求\"}"
     },
     "en": {
-        "nav_title": "Flight Assistant",
+        "app_title": "Flight Carry-On Checker",
+        "app_subtitle": "Travel Smart",
         "lang_btn": "中",
-        "tab_home": "Home",
-        "tab_process": "Process",
-        "tab_luggage": "Baggage",
-        "tab_ai": "AI Check",
-        "tab_tips": "Tips",
-        "home_sub": "Welcome to AI Flight Assistant",
-        "process_title": "Domestic Flight Steps",
-        "p1_t": "1. Check-in", "p1_d": "Arrive 2 hours early; get your boarding pass with ID and check your bags.",
-        "p2_t": "2. Security Check", "p2_d": "Show ID and boarding pass; take out electronics and power banks separately.",
-        "p3_t": "3. Waiting at the Gate", "p3_d": "Find your gate, wait nearby, and listen for boarding announcements.",
-        "p4_t": "4. Boarding", "p4_d": "Show your boarding pass, queue up and take your assigned seat.",
-        "lug_title": "Baggage Rules",
-        "lug_carry_t": "✅ Carry-on (Cabin Bag)",
-        "lug_carry_d": "1 carry-on bag, size within 20×40×55cm; weight usually ≤5kg.<br><br>⚠️ Power banks must be carried on, never checked.",
-        "lug_check_t": "📦 Checked Baggage",
-        "lug_check_d": "Economy: 20kg free allowance; extra weight costs more.<br><br>⚠️ Lithium batteries and power banks are forbidden in checked baggage.",
-        "ai_title": "AI Security Brain",
-        "ai_desc": "Enter any item, AI will judge if it can be brought on the plane",
-        "ai_ph": "e.g., pepper spray, cosmetics, steel wool, lighter",
-        "ai_btn": "Search Now",
-        "ai_spin": "AI is thinking...",
-        "ai_warn": "Please enter an item name!",
-        "ai_err": "Failed! Error: ",
-        "ai_prompt": "You are a professional aviation security expert. Judge if the item can be brought on a plane. You MUST return strictly in JSON format: {\"type\": \"danger/warn/ok\", \"tip\": \"One sentence conclusion\", \"desc\": \"Detailed explanation\"}",
-        "tips_title": "Travel Tips",
-        "tips_q1": "Q: When should I arrive at the airport?", "tips_a1": "2 hours before domestic, 3 hours before international flights.",
-        "tips_q2": "Q: What if I lose my ID?", "tips_a2": "Apply for a temporary boarding certificate at the airport police office.",
-        "tips_q3": "Q: How much liquid can I bring?", "tips_a3": "Carry-on: ≤100ml per bottle, ≤1L total, in a clear bag."
+        "hero_tag": "TRAVEL SMART · PACK WITH CONFIDENCE",
+        "hero_title": "Check before you go,\ntravel with peace of mind.",
+        "hero_desc": "Enter item name and capacity to get carry-on and checked baggage advice for Mainland China, HK/Macao/Taiwan, and International flights.",
+        "feat1": "Compliance\nBased on rules",
+        "feat2": "Fast Query\nInstant results",
+        "feat3": "Peace of Mind\nTravel easier",
+        
+        "tab1": "Quick Check",
+        "tab2": "Item Database",
+        "tab3": "Rules",
+        "tab4": "Recent",
+        
+        "form_title": "Check an Item",
+        "form_desc": "Select route, enter name and capacity to get advice.",
+        "route_label": "Flight Route",
+        "route_1": "Mainland",
+        "route_2": "HK/Macau/TW",
+        "route_3": "International",
+        "item_label": "Item Name",
+        "item_ph": "e.g., eye drops, power bank",
+        "capacity_label": "Capacity / Specs",
+        "capacity_ph": "e.g. 100",
+        "carry_label": "Carry Method",
+        "carry_1": "Carry-on",
+        "carry_2": "Checked",
+        "btn_search": "Search Now",
+        
+        "res_empty": "Enter item info on the left and click search",
+        "res_ok": "✅ Allowed",
+        "res_warn": "⚠️ Restricted",
+        "res_danger": "❌ Forbidden",
+        "res_basis": "Basis",
+        "res_btn_save": "Save",
+        "res_btn_copy": "Copy Text",
+        "res_tip": "For reference only. Final decision rests with security and airline.",
+        
+        "ai_prompt": "You are a professional aviation security expert. Based on item: {item}, capacity: {cap}, route: {route}. Judge if it can be brought on a plane. You MUST return strictly in JSON format: {\"type\": \"danger/warn/ok\", \"tip\": \"One sentence conclusion\", \"desc\": \"Detailed explanation for carry-on and checked\"}"
     }
 }
 
 if "lang" not in st.session_state:
     st.session_state.lang = "zh"
+if "search_result" not in st.session_state:
+    st.session_state.search_result = None
+if "search_item" not in st.session_state:
+    st.session_state.search_item = ""
+
 t = texts[st.session_state.lang]
 
-# ==========================================
-# 🚨 核心安全配置：从云端读取 Key 🚨
-# ==========================================
+# 安全读取 Key
 if "MY_API_KEY" in st.secrets:
     MY_API_KEY = st.secrets["MY_API_KEY"]
 else:
-    MY_API_KEY = "本地测试用的Key填这里"  # 如果在本地测试，可以填在这里
+    MY_API_KEY = "本地测试Key"
 
 # ==========================================
-# 🎨 CSS 样式
+# 🎨 注入宽屏专属 CSS
 # ==========================================
 st.markdown("""
 <style>
-    .stApp { background-color: #f5f7fa !important; }
+    /* 移除 Streamlit 默认留白，改为宽屏布局 */
+    .block-container { max-width: 1200px !important; padding-top: 1rem !important; }
     header {visibility: hidden;} footer {visibility: hidden;}
-    .block-container { max-width: 450px !important; padding-top: 1rem !important; padding-bottom: 2rem !important; }
-    .top-nav { background: linear-gradient(135deg, #1677ff 0%, #4d94ff 100%); padding: 16px 20px; border-radius: 12px; text-align: center; box-shadow: 0 4px 10px rgba(22, 119, 255, 0.2); margin-bottom: 10px; }
-    .nav-title { font-size: 18px; font-weight: bold; letter-spacing: 1px; color: white !important; -webkit-text-fill-color: white !important; }
-    button[kind="secondary"] { border-radius: 20px !important; border: 1px solid #1677ff !important; background: transparent !important; height: 35px !important; padding: 0 15px !important; font-size: 14px !important; font-weight: bold !important; }
-    button[kind="secondary"] p { color: #1677ff !important; -webkit-text-fill-color: #1677ff !important; }
-    div[data-baseweb="tab-list"] { gap: 15px; }
-    button[data-baseweb="tab"] p { color: #666666 !important; -webkit-text-fill-color: #666666 !important; font-size: 15px !important; font-weight: 500 !important; }
-    button[data-baseweb="tab"][aria-selected="true"] p { color: #1677ff !important; -webkit-text-fill-color: #1677ff !important; font-weight: bold !important; }
-    div[data-baseweb="tab-highlight"] { background-color: #1677ff !important; }
-    button[kind="primary"] { width: 100% !important; background: linear-gradient(135deg, #1677ff 0%, #4d94ff 100%) !important; border: none !important; border-radius: 12px !important; height: 50px !important; font-size: 16px !important; font-weight: bold !important; box-shadow: 0 6px 15px rgba(22, 119, 255, 0.3) !important; }
-    button[kind="primary"] p { color: white !important; -webkit-text-fill-color: white !important; }
-    div[data-testid="stTextInput"] input { border-radius: 12px !important; border: 2px solid #eef4ff !important; padding: 14px 20px !important; font-size: 16px !important; background-color: #ffffff !important; color: #333 !important; -webkit-text-fill-color: #333 !important; }
-    .content-card { background: white !important; border-radius: 12px; padding: 20px; margin-bottom: 15px; box-shadow: 0 4px 12px rgba(0,0,0,0.04); font-size: 15px; line-height: 1.6; color: #333333 !important; -webkit-text-fill-color: #333333 !important; }
-    .content-card b { color: #1677ff !important; font-size: 16px; -webkit-text-fill-color: #1677ff !important; display: block; margin-bottom: 8px; }
-    .banner { background: linear-gradient(135deg, #87b8f7, #1677ff); padding: 40px 20px; border-radius: 12px; text-align: center; font-size: 20px; font-weight: bold; margin-bottom: 20px; box-shadow: 0 6px 15px rgba(22, 119, 255, 0.2); color: white !important; -webkit-text-fill-color: white !important; }
-    .result-card { background: white !important; border-radius: 15px; padding: 20px; margin-top: 20px; box-shadow: 0 8px 24px rgba(0,0,0,0.06); animation: slideUp 0.4s ease-out; color: #333 !important; -webkit-text-fill-color: #333 !important; }
-    @keyframes slideUp { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
-    .res-tag { font-size: 20px; font-weight: bold; margin-bottom: 8px; }
-    .res-desc { font-size: 15px; line-height: 1.6; color: #555 !important; -webkit-text-fill-color: #555 !important; }
-    .danger { border-left: 8px solid #ff4d4f; } .danger .res-tag { color: #ff4d4f; -webkit-text-fill-color: #ff4d4f; }
-    .warn { border-left: 8px solid #faad14; } .warn .res-tag { color: #faad14; -webkit-text-fill-color: #faad14; }
-    .ok { border-left: 8px solid #52c41a; } .ok .res-tag { color: #52c41a; -webkit-text-fill-color: #52c41a; }
+    
+    /* 背景色 */
+    .stApp { background-color: #f8fafc; }
+    
+    /* 隐藏原生 Tab 边框，改成胶囊样式 */
+    button[data-baseweb="tab"] {
+        background-color: transparent !important;
+        border-radius: 8px !important;
+        padding: 10px 20px !important;
+    }
+    button[data-baseweb="tab"][aria-selected="true"] {
+        background-color: #1677ff !important;
+    }
+    button[data-baseweb="tab"][aria-selected="true"] p {
+        color: white !important;
+        -webkit-text-fill-color: white !important;
+        font-weight: bold !important;
+    }
+    button[data-baseweb="tab"] p {
+        color: #666 !important;
+        font-weight: 500 !important;
+        font-size: 15px !important;
+    }
+    div[data-baseweb="tab-highlight"] { display: none; }
+    
+    /* Hero Banner 区域 */
+    .hero-box {
+        background: linear-gradient(105deg, #1677ff 0%, #4d94ff 100%);
+        border-radius: 16px;
+        padding: 40px 50px;
+        color: white;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 25px;
+        box-shadow: 0 10px 30px rgba(22, 119, 255, 0.15);
+        position: relative;
+        overflow: hidden;
+    }
+    .hero-text { z-index: 2; max-width: 600px; }
+    .hero-tag { font-size: 12px; letter-spacing: 2px; font-weight: bold; opacity: 0.8; margin-bottom: 15px; }
+    .hero-title { font-size: 36px; font-weight: bold; line-height: 1.3; margin-bottom: 15px; white-space: pre-line; }
+    .hero-desc { font-size: 15px; opacity: 0.9; margin-bottom: 30px; line-height: 1.5; }
+    .hero-features { display: flex; gap: 40px; }
+    .feat-item { font-size: 14px; font-weight: bold; display: flex; flex-direction: column; gap: 4px; white-space: pre-line;}
+    .feat-item span { font-size: 12px; font-weight: normal; opacity: 0.8; }
+    
+    /* 左侧表单卡片 */
+    .form-card {
+        background: white; border-radius: 16px; padding: 30px;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.04);
+    }
+    .form-title { font-size: 22px; font-weight: bold; color: #333; margin-bottom: 5px; }
+    .form-desc { font-size: 14px; color: #888; margin-bottom: 25px; }
+    
+    /* 覆盖输入框和按钮样式 */
+    div[data-testid="stTextInput"] input, div[data-testid="stNumberInput"] input {
+        border-radius: 10px !important; border: 1px solid #e2e8f0 !important;
+        padding: 12px 15px !important; font-size: 15px !important;
+    }
+    button[kind="primary"] {
+        background: #1677ff !important; border-radius: 10px !important;
+        height: 45px !important; font-weight: bold !important;
+    }
+    
+    /* 右侧结果卡片 */
+    .result-card {
+        background: white; border-radius: 16px; padding: 30px;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.04);
+        min-height: 400px;
+    }
+    .tag-ok { background: #dcfce7; color: #166534; padding: 4px 12px; border-radius: 20px; font-size: 13px; font-weight: bold; display: inline-block; margin-bottom: 15px;}
+    .tag-warn { background: #fef08a; color: #854d0e; padding: 4px 12px; border-radius: 20px; font-size: 13px; font-weight: bold; display: inline-block; margin-bottom: 15px;}
+    .tag-danger { background: #fee2e2; color: #991b1b; padding: 4px 12px; border-radius: 20px; font-size: 13px; font-weight: bold; display: inline-block; margin-bottom: 15px;}
+    .res-title { font-size: 24px; font-weight: bold; color: #333; margin-bottom: 10px; }
+    .res-desc { font-size: 15px; color: #555; line-height: 1.6; margin-bottom: 25px; }
+    
+    .basis-box { background: #f8fafc; border-radius: 10px; padding: 20px; margin-bottom: 25px; border: 1px solid #f1f5f9;}
+    .basis-title { font-size: 14px; font-weight: bold; color: #1677ff; margin-bottom: 10px; }
 </style>
 """, unsafe_allow_html=True)
 
-st.markdown(f'<div class="top-nav"><div class="nav-title">✈️ {t["nav_title"]}</div></div>', unsafe_allow_html=True)
 
-col1, col2 = st.columns([7, 3])
-with col2:
+# ==========================================
+# 🚀 顶部导航栏
+# ==========================================
+col_logo, col_lang = st.columns([8, 1])
+with col_logo:
+    st.markdown(f"### ✈️ {t['app_title']} \n<span style='font-size:12px;color:#888;'>{t['app_subtitle']}</span>", unsafe_allow_html=True)
+with col_lang:
     if st.button(t["lang_btn"], type="secondary"):
         st.session_state.lang = "en" if st.session_state.lang == "zh" else "zh"
         st.rerun()
 
-tab1, tab2, tab3, tab4, tab5 = st.tabs([t["tab_home"], t["tab_process"], t["tab_luggage"], t["tab_ai"], t["tab_tips"]])
+st.write("") # 占位
+
+# ==========================================
+# 🚀 Hero 横幅 (左侧文字，右侧占位图)
+# ==========================================
+st.markdown(f"""
+<div class="hero-box">
+    <div class="hero-text">
+        <div class="hero-tag">{t['hero_tag']}</div>
+        <div class="hero-title">{t['hero_title']}</div>
+        <div class="hero-desc">{t['hero_desc']}</div>
+        <div class="hero-features">
+            <div class="feat-item">🛡️ {t['feat1']}</div>
+            <div class="feat-item">⚡ {t['feat2']}</div>
+            <div class="feat-item">🧳 {t['feat3']}</div>
+        </div>
+    </div>
+</div>
+""", unsafe_allow_html=True)
+
+
+# ==========================================
+# 🚀 核心 Tabs 区域
+# ==========================================
+tab1, tab2, tab3, tab4 = st.tabs([t["tab1"], t["tab2"], t["tab3"], t["tab4"]])
 
 with tab1:
-    st.markdown(f'<div class="banner">{t["home_sub"]}</div>', unsafe_allow_html=True)
-    st.info("👆 请点击上方选项卡，切换不同功能模块！")
+    # 左右分栏布局 (左表单 1.2 : 右结果 1)
+    col_left, col_right = st.columns([1.2, 1], gap="large")
+
+    # ---------- 左侧：查询表单 ----------
+    with col_left:
+        st.markdown(f"""
+        <div class="form-card">
+            <div class="form-title">🔍 {t['form_title']}</div>
+            <div class="form-desc">{t['form_desc']}</div>
+        </div>
+        """, unsafe_allow_html=True)
+        
+        # 航线选择
+        st.write(t["route_label"])
+        route = st.radio("route", [t["route_1"], t["route_2"], t["route_3"]], horizontal=True, label_visibility="collapsed")
+        
+        # 物品和容量
+        item_name = st.text_input(t["item_label"], placeholder=t["item_ph"])
+        
+        col_cap, col_unit = st.columns([3, 1])
+        with col_cap:
+            capacity = st.text_input(t["capacity_label"], placeholder=t["capacity_ph"])
+        with col_unit:
+            st.write(" ") # 占位
+            st.write("ml")
+            
+        # 携带方式
+        st.write(t["carry_label"])
+        carry_method = st.radio("carry", [t["carry_1"], t["carry_2"]], horizontal=True, label_visibility="collapsed")
+        
+        st.write("")
+        # 查询按钮
+        if st.button(t["btn_search"], type="primary", use_container_width=True):
+            if not item_name:
+                st.warning("请输入物品名称")
+            else:
+                with st.spinner("AI 正在判断中..."):
+                    # 准备请求
+                    url = 'https://open.bigmodel.cn/api/paas/v4/chat/completions'
+                    headers = {'Content-Type': 'application/json', 'Authorization': f'Bearer {MY_API_KEY}'}
+                    
+                    prompt = t["ai_prompt"].format(item=item_name, cap=capacity, route=route)
+                    data = {
+                        "model": "glm-4-flash",
+                        "messages": [{"role": "system", "content": prompt}],
+                        "temperature": 0.1
+                    }
+                    try:
+                        response = requests.post(url, headers=headers, json=data, timeout=10)
+                        response.raise_for_status()
+                        ai_text = response.json()['choices'][0]['message']['content']
+                        ai_text = ai_text.replace('```json', '').replace('```', '').strip()
+                        result = json.loads(ai_text)
+                        
+                        # 保存到 session_state
+                        st.session_state.search_result = result
+                        st.session_state.search_item = f"{item_name} · {capacity}ml"
+                    except Exception as e:
+                        st.error(f"查询失败: {e}")
+
+    # ---------- 右侧：结果展示 ----------
+    with col_right:
+        if st.session_state.search_result is None:
+            # 空状态
+            st.markdown(f"""
+            <div class="result-card" style="display:flex; align-items:center; justify-content:center;">
+                <div style="color:#94a3b8; font-size:15px;">{t['res_empty']}</div>
+            </div>
+            """, unsafe_allow_html=True)
+        else:
+            # 渲染结果
+            res = st.session_state.search_result
+            item_title = st.session_state.search_item
+            
+            if res['type'] == 'ok':
+                tag_class = "tag-ok"
+                tag_text = t['res_ok']
+            elif res['type'] == 'warn':
+                tag_class = "tag-warn"
+                tag_text = t['res_warn']
+            else:
+                tag_class = "tag-danger"
+                tag_text = t['res_danger']
+                
+            st.markdown(f"""
+            <div class="result-card">
+                <div class="{tag_class}">{tag_text}</div>
+                <div class="res-title">{item_title}</div>
+                <div class="res-desc">{res['desc']}</div>
+                
+                <div class="basis-box">
+                    <div class="basis-title">📋 {t['res_basis']}</div>
+                    <div style="font-size:14px; color:#555;">{res['tip']}</div>
+                </div>
+                
+                <div style="display:flex; gap:10px; margin-bottom:20px;">
+                    <button style="flex:1; padding:10px; background:#1677ff; color:white; border:none; border-radius:8px; font-weight:bold; cursor:pointer;">{t['res_btn_save']}</button>
+                    <button style="flex:1; padding:10px; background:white; color:#333; border:1px solid #ccc; border-radius:8px; font-weight:bold; cursor:pointer;">{t['res_btn_copy']}</button>
+                </div>
+                
+                <div style="font-size:12px; color:#94a3b8; text-align:center;">{t['res_tip']}</div>
+            </div>
+            """, unsafe_allow_html=True)
 
 with tab2:
-    st.markdown(f'<div style="color:#1677ff !important; font-weight:bold; margin-bottom:15px; font-size:20px;">{t["process_title"]}</div>', unsafe_allow_html=True)
-    st.markdown(f'<div class="content-card"><b>{t["p1_t"]}</b>{t["p1_d"]}</div>', unsafe_allow_html=True)
-    st.markdown(f'<div class="content-card"><b>{t["p2_t"]}</b>{t["p2_d"]}</div>', unsafe_allow_html=True)
-    st.markdown(f'<div class="content-card"><b>{t["p3_t"]}</b>{t["p3_d"]}</div>', unsafe_allow_html=True)
-    st.markdown(f'<div class="content-card"><b>{t["p4_t"]}</b>{t["p4_d"]}</div>', unsafe_allow_html=True)
-
+    st.info("物品资料库正在建设中...")
 with tab3:
-    st.markdown(f'<div style="color:#1677ff !important; font-weight:bold; margin-bottom:15px; font-size:20px;">{t["lug_title"]}</div>', unsafe_allow_html=True)
-    st.markdown(f'<div class="content-card" style="border-left: 8px solid #1677ff;"><b>{t["lug_carry_t"]}</b>{t["lug_carry_d"]}</div>', unsafe_allow_html=True)
-    st.markdown(f'<div class="content-card" style="border-left: 8px solid #1677ff;"><b>{t["lug_check_t"]}</b>{t["lug_check_d"]}</div>', unsafe_allow_html=True)
-
+    st.info("规则说明正在建设中...")
 with tab4:
-    st.markdown(f'<div style="color:#1677ff !important; font-weight:bold; font-size:20px;">{t["ai_title"]}</div>', unsafe_allow_html=True)
-    st.markdown(f'<div style="color:#888 !important; font-size:14px; margin-bottom:20px;">{t["ai_desc"]}</div>', unsafe_allow_html=True)
-    
-    item = st.text_input("item", placeholder=t["ai_ph"], label_visibility="collapsed")
-    
-    if st.button(t["ai_btn"], type="primary", use_container_width=True):
-        if not item:
-            st.warning(t["ai_warn"])
-        else:
-            with st.spinner(t["ai_spin"]):
-                url = 'https://open.bigmodel.cn/api/paas/v4/chat/completions'
-                headers = {'Content-Type': 'application/json', 'Authorization': f'Bearer {MY_API_KEY}'}
-                data = {
-                    "model": "glm-4-flash",
-                    "messages": [
-                        {"role": "system", "content": t["ai_prompt"]},
-                        {"role": "user", "content": item}
-                    ],
-                    "temperature": 0.1
-                }
-                try:
-                    response = requests.post(url, headers=headers, json=data, timeout=10)
-                    response.raise_for_status()
-                    ai_text = response.json()['choices'][0]['message']['content']
-                    ai_text = ai_text.replace('```json', '').replace('```', '').strip()
-                    result = json.loads(ai_text)
-                    
-                    if result['type'] == 'danger': card_class = "danger"
-                    elif result['type'] == 'warn': card_class = "warn"
-                    else: card_class = "ok"
-                        
-                    html_card = f"""
-                    <div class="result-card {card_class}">
-                        <div class="res-tag">{result['tip']}</div>
-                        <div class="res-desc">{result['desc']}</div>
-                    </div>
-                    """
-                    st.markdown(html_card, unsafe_allow_html=True)
-                except Exception as e:
-                    st.error(f"{t['ai_err']} {e}")
-
-with tab5:
-    st.markdown(f'<div style="color:#1677ff !important; font-weight:bold; margin-bottom:15px; font-size:20px;">{t["tips_title"]}</div>', unsafe_allow_html=True)
-    st.markdown(f'<div class="content-card"><b>{t["tips_q1"]}</b>{t["tips_a1"]}</div>', unsafe_allow_html=True)
-    st.markdown(f'<div class="content-card"><b>{t["tips_q2"]}</b>{t["tips_a2"]}</div>', unsafe_allow_html=True)
-    st.markdown(f'<div class="content-card"><b>{t["tips_q3"]}</b>{t["tips_a3"]}</div>', unsafe_allow_html=True)
+    st.info("最近查询记录为空...")
