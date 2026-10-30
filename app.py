@@ -262,5 +262,4 @@ with tab5:
         st.markdown(f'{t["tips_q1"]}  {t["tips_a1"]}', unsafe_allow_html=True)
     with col_t2:
         st.markdown(f'{t["tips_q2"]}  {t["tips_a2"]}', unsafe_allow_html=True)
-    st.markdown(f'{t["tips_q3"]}  
-{t["tips_a3"]}', unsafe_allow_html=True)
+    st.markdown(f'{t["tips_q3"]}  {t["tips_a3"]}', unsafe_allow_html=True)
