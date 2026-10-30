@@ -191,9 +191,7 @@ with st.container(border=True):
 # ================= 乘机流程 =================
 
 with tab2:
-    st.markdown(f'
-
-{t["process_title"]}', unsafe_allow_html=True)
+    st.markdown(f'{t["process_title"]}', unsafe_allow_html=True)
     col_p1, col_p2 = st.columns(2, gap="medium")
     with col_p1:
         st.markdown(f'{t["p1_t"]}{t["p1_d"]}', unsafe_allow_html=True)
