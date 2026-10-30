@@ -203,9 +203,7 @@ with tab2:
 # ================= 行李规定 =================
 
 with tab3:
-    st.markdown(f'
-
-{t["lug_title"]}', unsafe_allow_html=True)
+    st.markdown(f'{t["lug_title"]}', unsafe_allow_html=True)
     col_l1, col_l2 = st.columns(2, gap="medium")
     with col_l1:
         st.markdown(f'{t["lug_carry_t"]}{t["lug_carry_d"]}', unsafe_allow_html=True)
@@ -215,9 +213,7 @@ with tab3:
 # ================= AI 安检 =================
 
 with tab4:
-    st.markdown(f'
-
-{t["ai_title"]}', unsafe_allow_html=True)
+    st.markdown(f'{t["ai_title"]}', unsafe_allow_html=True)
     st.markdown(f'{t["ai_desc"]}', unsafe_allow_html=True)
     col_input, col_result = st.columns([1, 1.2], gap="large")
     with col_input:
