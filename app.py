@@ -6,7 +6,7 @@ st.set_page_config(page_title="乘机流程助手", page_icon="✈️", layout="
 
 # ==========================================
 
-# 🌐 文字字典 (已精简防错)
+# 🌐 文字字典 (已彻底修复引号嵌套问题)
 
 # ==========================================
 
@@ -53,7 +53,7 @@ texts = {
         "ai_spin": "AI 安检专家正在思考中...",
         "ai_warn": "请输入物品名称！",
         "ai_err": "查询失败！错误: ",
-        "ai_prompt": "你是一个专业的航空安检专家。请判断物品能否带上飞机。必须严格返回纯JSON格式：{"type": "danger/warn/ok", "tip": "一句话结论", "desc": "详细解释"}",
+        "ai_prompt": "你是一个专业的航空安检专家。请判断物品能否带上飞机。必须严格返回纯JSON格式，不要包含markdown代码块符号。JSON必须包含三个键：type（值为danger, warn, ok之一）, tip（一句话结论）, desc（详细解释）。",
         "res_empty": "请在左侧输入物品并点击查询",
         "res_basis": "判断依据",
         "tips_title": "乘机小常识",
@@ -106,7 +106,7 @@ texts = {
         "ai_spin": "AI is thinking...",
         "ai_warn": "Please enter an item name!",
         "ai_err": "Failed! Error: ",
-        "ai_prompt": "You are a professional aviation security expert. Judge if the item can be brought on a plane. You MUST return strictly in JSON format: {"type": "danger/warn/ok", "tip": "One sentence conclusion", "desc": "Detailed explanation"}",
+        "ai_prompt": "You are a professional aviation security expert. Judge if the item can be brought on a plane. You MUST return strictly in raw JSON format without markdown blocks. The JSON must contain exactly three keys: type (must be danger, warn, or ok), tip (one sentence conclusion), and desc (detailed explanation).",
         "res_empty": "Enter an item on the left and click Search",
         "res_basis": "Basis",
         "tips_title": "Travel Tips",
