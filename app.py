@@ -97,7 +97,7 @@ else:
     MY_API_KEY = "本地测试Key"
 
 # ==========================================
-# 🎨 全新 CSS（放弃强行包裹，使用原生对齐）
+# 🎨 全新 CSS
 # ==========================================
 st.markdown("""
 <style>
@@ -105,13 +105,11 @@ st.markdown("""
     header {visibility: hidden;} footer {visibility: hidden;}
     .stApp { background-color: #f5f7fa !important; }
     
-    /* 强制深色文字 */
     p, h1, h2, h3, h4, h5, h6, span, div, label {
         color: #333333 !important;
         -webkit-text-fill-color: #333333 !important;
     }
 
-    /* 顶部横幅 */
     .top-nav {
         background: linear-gradient(135deg, #1677ff 0%, #4d94ff 100%);
         padding: 20px; border-radius: 12px; text-align: center;
@@ -122,7 +120,6 @@ st.markdown("""
         color: white !important; -webkit-text-fill-color: white !important;
     }
 
-    /* 语言按钮 */
     button[kind="secondary"] {
         border-radius: 20px !important; border: 1px solid #1677ff !important;
         background: transparent !important; height: 38px !important;
@@ -130,7 +127,6 @@ st.markdown("""
     }
     button[kind="secondary"] p { color: #1677ff !important; -webkit-text-fill-color: #1677ff !important; }
 
-    /* Tab 栏 */
     button[data-baseweb="tab"] p {
         color: #666666 !important; -webkit-text-fill-color: #666666 !important;
         font-size: 16px !important; font-weight: bold !important;
@@ -140,7 +136,6 @@ st.markdown("""
     }
     div[data-baseweb="tab-highlight"] { background-color: #1677ff !important; }
 
-    /* 输入框与按钮 */
     div[data-testid="stTextInput"] input {
         border-radius: 10px !important; border: 2px solid #eef4ff !important;
         padding: 12px 15px !important; font-size: 16px !important;
@@ -155,7 +150,6 @@ st.markdown("""
     }
     button[kind="primary"] p { color: white !important; -webkit-text-fill-color: white !important; }
 
-    /* 统一卡片样式 */
     div[data-testid="stVerticalBlockBorderWrapper"] {
         background-color: white !important;
         border-radius: 12px !important;
@@ -164,7 +158,6 @@ st.markdown("""
         padding: 20px !important;
     }
     
-    /* 文本卡片 */
     .text-card { background: white; border-radius: 12px; padding: 20px; margin-bottom: 15px; box-shadow: 0 4px 12px rgba(0,0,0,0.03); border: 1px solid #f1f5f9;}
     .text-card b { color: #1677ff !important; font-size: 16px; display: block; margin-bottom: 8px; }
 </style>
@@ -173,8 +166,6 @@ st.markdown("""
 # ==========================================
 # 🚀 页面渲染
 # ==========================================
-
-# 顶部：用 Column 分栏，保证 EN 按钮和标题对齐
 col_space, col_banner, col_lang = st.columns([1, 6, 1])
 with col_banner:
     st.markdown(f'<div class="top-nav"><h1>✈️ {t["nav_title"]}</h1></div>', unsafe_allow_html=True)
@@ -186,13 +177,14 @@ with col_lang:
 
 st.write("")
 
-# 选项卡
 tab1, tab2, tab3, tab4, tab5 = st.tabs([
     t["tab_home"], t["tab_process"], t["tab_luggage"], t["tab_ai"], t["tab_tips"]
 ])
 
 with tab1:
     st.write("")
+    # 首页大横幅
+    st.markdown(f'<div style="background: linear-gradient(135deg, #87b8f7, #1677ff); padding: 60px 20px; border-radius: 12px; text-align: center; font-size: 28px; font-weight: bold; color: white !important; -webkit-text-fill-color: white !important; box-shadow: 0 6px 20px rgba(22, 119, 255, 0.2); margin-bottom: 20px;">✈️ {t["home_sub"]}</div>', unsafe_allow_html=True)
     st.info(t["home_tip"])
 
 with tab2:
@@ -217,11 +209,9 @@ with tab4:
     st.markdown(f'<div style="color:#1677ff; font-weight:bold; font-size:22px; margin-bottom:5px;">{t["ai_title"]}</div>', unsafe_allow_html=True)
     st.markdown(f'<div style="color:#888; font-size:15px; margin-bottom:25px;">{t["ai_desc"]}</div>', unsafe_allow_html=True)
     
-    # 核心：左右两列，1比1.2等宽
     col_input, col_result = st.columns([1, 1.2], gap="large")
     
     with col_input:
-        # 使用 Streamlit 官方 border 原生支持卡片（兼容最新版），让输入框和按钮完美包裹
         with st.container(border=True):
             st.write(t["ai_ph"])
             item = st.text_input("item_input", label_visibility="collapsed")
@@ -259,7 +249,6 @@ with tab4:
 
     with col_result:
         if st.session_state.ai_result is None:
-            # 空白状态的虚线框
             st.markdown(f'<div style="background:white; border: 2px dashed #cbd5e1; border-radius: 12px; height: 220px; display:flex; align-items:center; justify-content:center;"><span style="color:#94a3b8 !important;">{t["res_empty"]}</span></div>', unsafe_allow_html=True)
         else:
             res = st.session_state.ai_result
@@ -270,7 +259,6 @@ with tab4:
             else:
                 color = "#52c41a"
                 
-            # 必须写在一行，绝对不能换行，否则就会变成截图里的黑色代码块！
             html_card = f'<div style="background: white; border-radius: 12px; padding: 25px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); border-left: 8px solid {color}; min-height: 220px;"><div style="font-size: 22px; font-weight: bold; color: {color} !important; margin-bottom: 10px;">{res["tip"]}</div><div style="font-size: 20px; font-weight: bold; color: #333 !important; margin-bottom: 15px;">{st.session_state.ai_item}</div><div style="font-size: 16px; line-height: 1.6; color: #555 !important;">{res["desc"]}</div><div style="background: #f8fafc; padding: 15px; border-radius: 8px; margin-top: 20px; border: 1px solid #e2e8f0;"><div style="font-size: 14px; font-weight: bold; color: #1677ff !important; margin-bottom: 5px;">📋 {t["res_basis"]}</div><div style="font-size: 14px; color: #555 !important;">依据民航局安检规定，具体以机场现场为准。</div></div></div>'
             
             st.markdown(html_card, unsafe_allow_html=True)
